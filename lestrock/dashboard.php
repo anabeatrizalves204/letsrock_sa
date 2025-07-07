@@ -20,7 +20,7 @@ try {
     $stmt_discos->execute();
     $discos_destaque = $stmt_discos->fetchAll(PDO::FETCH_ASSOC);
 } catch(PDOException $e) {
-    // Se não houver discos, continuará com array vazio
+    // Se não tiver discos, continuará com array vazio
 }
 
 // Buscar carrinho do usuário
@@ -124,6 +124,116 @@ try {
         </div>
       </div>
     </footer> <!-- fim do footer/cabeçalho -->
+
+    <script>
+
+    const token = 'VYDCUuUzLhDCKknVLCjSrdGObRGeyLVDexwPyXgH';
+
+function carregarDiscos() {
+  const query = document.getElementById('busca').value.trim();
+  const container = document.getElementById('lista-produtos');
+
+  container.innerHTML = 'Carregando...';
+
+  // Busca na API do Discogs
+  const discogs = fetch(`https://api.discogs.com/database/search?q=${query}&token=${token}`)
+    .then(res => res.json())
+    .then(data => {
+      if (data.results) {
+        return data.results.map(disco => ({
+          ...disco,
+          fonte: 'discogs',
+          id: disco.id,
+          title: disco.title,
+          year: disco.year,
+          cover_image: disco.cover_image
+        }));
+      }
+      return [];
+    })
+    .catch(err => {
+      console.error('Erro ao buscar no Discogs:', err);
+      return [];
+    });
+
+  // Busca nos discos locais
+  const locais = fetch(`discos_local.php?busca=${query}`)
+    .then(res => res.json())
+    .then(data => {
+      if (data.status === 'ok') {
+        return data.results.map(disco => ({
+          ...disco,
+          fonte: 'local',
+          id: disco.id,
+          title: disco.title,
+          year: disco.year,
+          cover_image: disco.cover_image
+        }));
+      }
+      console.error('Erro nos discos locais:', data.mensagem);
+      return [];
+    })
+    .catch(err => {
+      console.error('Erro ao buscar discos locais:', err);
+      return [];
+    });
+
+  Promise.all([discogs, locais]).then(([api, local]) => {
+    // Combinar os resultados - colocar os locais primeiro
+    const todos = [...local, ...api];
+
+    if (todos.length === 0) {
+      container.innerHTML = '<p>Nenhum disco encontrado.</p>';
+      return;
+    }
+
+    container.innerHTML = '';
+    todos.forEach(disco => {
+      // Verificar se tem imagem válida
+      const imagem = disco.cover_image && disco.cover_image !== '' 
+        ? disco.cover_image 
+        : 'imgs/sem-capa.jpg';
+
+      // Criar link para detalhes baseado na fonte
+      let linkDetalhes = '';
+      linkDetalhes = `detalhesprod.php?id=${disco.id}&fonte=${disco.fonte}`;
+
+
+      container.innerHTML += `
+        <div class="produto">
+          <a href="${linkDetalhes}">
+            <img src="${imagem}" alt="${disco.title}" width="150" onerror="this.src='imgs/sem-capa.jpg'"><br>
+            <strong>${disco.title}</strong><br>
+            <span>${disco.year || 'Ano desconhecido'}</span>
+          </a>
+          <br><small style="color: #666;">Fonte: ${disco.fonte === 'local' ? 'Loja' : 'Discogs'}</small>
+        </div>
+      `;
+    });
+  }).catch(err => {
+    console.error('Erro geral:', err);
+    container.innerHTML = '<p>Erro ao carregar discos.</p>';
+  });
+}
+
+// Botão de busca
+document.getElementById('botao-buscar').addEventListener('click', carregarDiscos);
+
+// Enter no campo de busca
+document.getElementById('busca').addEventListener('keypress', function(e) {
+  if (e.key === 'Enter') {
+    carregarDiscos();
+  }
+});
+
+// Carregar discos ao abrir a página (busca vazia = todos os discos)
+window.onload = function() {
+  carregarDiscos();
+};
+
+</script>
+
+
 </body>
 </html>
 

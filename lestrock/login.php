@@ -63,20 +63,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 
                 $login_valido = false;
                 
-                // MÉTODO 1: Tentar password_verify() (para senhas criadas no cadastro)
                 if (password_verify($senha, $usuario['senha_hash'])) {
                     $login_valido = true;
                     error_log("Login com password_hash para: " . $email);
                 }
                 
-                // MÉTODO 2: Tentar SHA256 (para senhas do banco original)
                 if (!$login_valido) {
                     $senhaHashSHA256 = hash('sha256', $senha);
                     if ($senhaHashSHA256 === $usuario['senha_hash']) {
                         $login_valido = true;
                         error_log("Login com SHA256 para: " . $email);
                         
-                        // OPCIONAL: Migrar automaticamente para password_hash
                         try {
                             $novo_hash = password_hash($senha, PASSWORD_DEFAULT);
                             $sql_update = "UPDATE usuarios SET senha_hash = :novo_hash WHERE id = :id";
@@ -173,15 +170,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <a href="cadastro.php" class="link">Não tem conta? Cadastre-se</a>
             </div>
 
-            <div style="margin-top: 20px; padding: 15px; background: rgba(229, 184, 126, 0.1); border-radius: 10px; border: 1px solid rgba(229, 184, 126, 0.3);">
-                <p style="color: rgba(235, 208, 164, 0.8); text-align: center; font-size: 0.85rem; margin: 0;">
-                    <strong>🔧 SISTEMA HÍBRIDO ATIVO</strong><br>
-                    <strong>Admin:</strong> admin@letsrock.com / admin123<br>
-                    <strong>Usuários antigos:</strong> kaiodudu10@gmail.com / 123456<br>
-                    <strong>Novos cadastros:</strong> Funcionam automaticamente<br>
-                    <em>Sistema detecta automaticamente o tipo de senha</em>
-                </p>
-            </div>
         </div>
     </div>
 </body>

@@ -58,6 +58,7 @@ $pedidos = $stmt->fetchAll();
                         <th>Pagamento</th>
                         <th>Forma</th>
                         <th>Total</th>
+                        <th>Ações</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -69,11 +70,33 @@ $pedidos = $stmt->fetchAll();
                             <td><?= ucfirst($pedido['status_pagamento'] ?? '---') ?></td>
                             <td><?= $pedido['forma_pagamento'] ?? '---' ?></td>
                             <td>R$ <?= number_format($pedido['valor_pago'], 2, ',', '.') ?></td>
+                            <td>
+                                <?php if ($pedido['status_pagamento'] === 'pago'): ?>
+                                    <button class="btn-comprovante" onclick="gerarComprovante(<?= $pedido['pedido_id'] ?>)">
+                                        Gerar Comprovante
+                                    </button>
+                                <?php else: ?>
+                                    <span class="sem-comprovante">---</span>
+                                <?php endif; ?>
+                            </td>
                         </tr>
                     <?php endforeach; ?>
                 </tbody>
             </table>
         <?php endif; ?>
     </div>
+
+    <!-- Modal para exibir o comprovante -->
+    <div id="modalComprovante" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <div id="comprovanteContent"></div>
+            <div class="modal-actions">
+                <button id="btnImprimir" class="btn-imprimir">Imprimir</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/comprovante.js"></script>
 </body>
 </html>

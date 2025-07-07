@@ -13,6 +13,7 @@ body {
 
 h2 {
     margin-bottom: 20px;
+    text-align: center;
 }
 
 table {
@@ -53,4 +54,14 @@ button {
 
 .btn-importar:hover {
     background-color: #388e3c;
+}
+
+a {
+    text-decoration: none;
+    color: #8d0606;
+    font-weight: bold;
+}
+
+a:hover {
+    color: #ad4646;
 }
