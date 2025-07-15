@@ -48,6 +48,7 @@ if ($carrinho) {
     <meta charset="UTF-8">
     <title>Carrinho - Let's Rock Disco Store</title>
     <link rel="stylesheet" href="css/carrinho.css">
+    <script src="js/carrinho.js" defer></script>
 </head>
 <body>
 <header class="topo">

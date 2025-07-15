@@ -76,14 +76,29 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 </head>
 <body>
+<nav class="topbar">
+    <ul class="nav-links">
+        <li><a href="admin_dashboard.php">Dashboard</a></li>
+        <li><a href="admin_pedidos.php">Pedidos</a></li>
+        <li><a href="admin_usuarios.php">Usuários</a></li>
+        <li><a href="admin_funcionarios.php">Funcionários</a></li>
+        <li><a href="admin_cadastrar_disco.php">Novo Disco</a></li>
+        <li><a href="admin_cadastrar_funcionario.php">Novo Funcionário</a></li>
+        <li><a href="admin_estoque.php">Estoque</a></li>
+    </ul>
+</nav>
+
+<div class="container" style="margin-top: 80px;">
+
+
     <h1>Cadastrar Novo Disco</h1>
+    <a href="admin_dashboard.php"><button>← Voltar para o Painel</button></a><br><br>
 
     <?php if ($mensagem): ?>
         <p><strong><?= htmlspecialchars($mensagem) ?></strong></p>
     <?php endif; ?>
 
     <form method="post" enctype="multipart/form-data" onsubmit="return validarFormulario();">
-        <label>Discogs ID: <input type="number" name="discogs_id"></label><br><br>
         <label>Título*: <input type="text" name="titulo" required></label><br><br>
         <label>Artista*: <input type="text" name="artista" required></label><br><br>
         <label>Ano: <input type="number" name="ano" maxlength="4"></label><br><br>

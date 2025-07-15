@@ -28,8 +28,22 @@ $pedidos = $pdo->query($sql)->fetchAll(PDO::FETCH_ASSOC);
     <link rel="stylesheet" href="css/admin_pedidos.css">
 </head>
 <body>
+<nav class="topbar">
+    <ul class="nav-links">
+        <li><a href="admin_dashboard.php">Dashboard</a></li>
+        <li><a href="admin_pedidos.php">Pedidos</a></li>
+        <li><a href="admin_usuarios.php">Usuários</a></li>
+        <li><a href="admin_funcionarios.php">Funcionários</a></li>
+        <li><a href="admin_cadastrar_disco.php">Novo Disco</a></li>
+        <li><a href="admin_cadastrar_funcionario.php">Novo Funcionário</a></li>
+        <li><a href="admin_estoque.php">Estoque</a></li>
+    </ul>
+</nav>
+<div class="container" style="margin-top: 80px;">
     <div class="container">
         <h1> Pedidos Realizados</h1>
+        <a href="admin_dashboard.php" class="voltar-btn">← Voltar ao Painel</a>
+
 
         <table>
             <thead>
@@ -64,8 +78,6 @@ $pedidos = $pdo->query($sql)->fetchAll(PDO::FETCH_ASSOC);
                 <?php endforeach; ?>
             </tbody>
         </table>
-
-        <a href="admin_dashboard.php" class="voltar-btn">← Voltar ao Painel</a>
     </div>
 </body>
 </html>

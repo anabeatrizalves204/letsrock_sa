@@ -32,6 +32,8 @@ if ($fonte === 'local') {
     $preco = $disco['preco'];
     $gravadora = $disco['gravadora'] ?? 'Não informada';
     $pais = $disco['pais'] ?? 'Não informado';
+    $estoque = $disco['estoque'] ?? 0; // ← lê o estoque
+
 } else {
     // API Discogs
     $key = "CdGODaeIwjOSStGpHleL";
@@ -108,13 +110,23 @@ if ($fonte === 'local') {
     <p><strong>Estilo:</strong> <?php echo htmlspecialchars($estilo); ?></p>
     <p><strong>Descrição:</strong> <?php echo nl2br(htmlspecialchars($descricao)); ?></p>
 
+    <?php if ($fonte === 'local' && $estoque == 0): ?>
+      
+      <p class="mensagem-estoque-esgotado">
+    Produto esgotado no estoque!
+      </p>
+
+
+<?php else: ?>
     <form action="adicionar_carrinho.php" method="post" style="text-align: center; margin-top: 30px;">
-    <input type="hidden" name="id" value="<?php echo $id; ?>">
-    <input type="hidden" name="titulo" value="<?php echo htmlspecialchars($titulo); ?>">
-    <input type="hidden" name="preco" value="<?php echo $preco; ?>">
-    <input type="hidden" name="imagem_url" value="<?php echo $imagem_url; ?>">
-    <button type="submit" class="botao-carrinho">Adicionar ao Carrinho</button>
-</form>
+        <input type="hidden" name="id" value="<?php echo $id; ?>">
+        <input type="hidden" name="titulo" value="<?php echo htmlspecialchars($titulo); ?>">
+        <input type="hidden" name="preco" value="<?php echo $preco; ?>">
+        <input type="hidden" name="imagem_url" value="<?php echo $imagem_url; ?>">
+        <button type="submit" class="botao-carrinho">Adicionar ao Carrinho</button>
+    </form>
+<?php endif; ?>
+
 
   </div>
   

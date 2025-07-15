@@ -10,10 +10,6 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-// Configurações do administrador
-define('ADMIN_EMAIL', 'admin@letsrock.com');
-define('ADMIN_SENHA', 'admin123');
-
 // Verificar se usuário já está logado
 if (isset($_SESSION['usuario_id'])) {
     if (!empty($_SESSION['is_admin'])) {
@@ -30,6 +26,7 @@ if (isset($_SESSION['mensagem'])) {
     unset($_SESSION['mensagem']);
 }
 
+// Login
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $email = trim($_POST['email']);
     $senha = $_POST['senha'];
@@ -37,43 +34,27 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (empty($email) || empty($senha)) {
         $erro = 'Email e senha são obrigatórios!';
     } else {
-        // Login de administrador
-        if ($email === ADMIN_EMAIL && $senha === ADMIN_SENHA) {
-            $_SESSION['usuario_id'] = 'admin';
-            $_SESSION['usuario_nome'] = 'Administrador';
-            $_SESSION['usuario_email'] = ADMIN_EMAIL;
-            $_SESSION['is_admin'] = true;
-
-            echo "<script>
-                alert('Login de administrador realizado com sucesso!');
-                window.location.href = 'admin_dashboard.php';
-            </script>";
-            exit;
-        }
-
-        // Login de usuário comum
         try {
-            $sql = "SELECT id, nome, email, senha_hash FROM usuarios WHERE email = :email";
+            // Consulta usuário
+            $sql = "SELECT id, nome, email, senha_hash, is_admin FROM usuarios WHERE email = :email";
             $stmt = $pdo->prepare($sql);
             $stmt->bindParam(':email', $email);
             $stmt->execute();
-        
+
             if ($stmt->rowCount() > 0) {
                 $usuario = $stmt->fetch(PDO::FETCH_ASSOC);
-                
                 $login_valido = false;
-                
+
+                // Verifica com password_hash
                 if (password_verify($senha, $usuario['senha_hash'])) {
                     $login_valido = true;
-                    error_log("Login com password_hash para: " . $email);
-                }
-                
-                if (!$login_valido) {
+                } else {
+                    // Verifica com SHA256 (compatibilidade antiga)
                     $senhaHashSHA256 = hash('sha256', $senha);
                     if ($senhaHashSHA256 === $usuario['senha_hash']) {
                         $login_valido = true;
-                        error_log("Login com SHA256 para: " . $email);
-                        
+
+                        // Migra para password_hash
                         try {
                             $novo_hash = password_hash($senha, PASSWORD_DEFAULT);
                             $sql_update = "UPDATE usuarios SET senha_hash = :novo_hash WHERE id = :id";
@@ -81,41 +62,35 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                             $stmt_update->bindParam(':novo_hash', $novo_hash);
                             $stmt_update->bindParam(':id', $usuario['id']);
                             $stmt_update->execute();
-                            error_log("Senha migrada automaticamente para password_hash: " . $email);
                         } catch (Exception $e) {
-                            error_log("Erro na migração automática: " . $e->getMessage());
+                            error_log("Erro ao atualizar hash: " . $e->getMessage());
                         }
                     }
                 }
-                
+
                 if ($login_valido) {
-                    // Login OK
                     $_SESSION['usuario_id'] = $usuario['id'];
                     $_SESSION['usuario_nome'] = $usuario['nome'];
                     $_SESSION['usuario_email'] = $usuario['email'];
-                    $_SESSION['is_admin'] = false;
-        
+                    $_SESSION['is_admin'] = !empty($usuario['is_admin']);
+
                     echo "<script>
-                            alert('Login realizado com sucesso!');
-                            window.location.href = 'dashboard.php';
-                          </script>";
+                        alert('Login realizado com sucesso!');
+                        window.location.href = '" . (!empty($usuario['is_admin']) ? 'admin_dashboard.php' : 'dashboard.php') . "';
+                    </script>";
                     exit;
                 } else {
                     $erro = 'Email ou senha incorretos!';
-                    error_log("Falha no login para: " . $email);
                 }
-        
             } else {
                 $erro = 'Email ou senha incorretos!';
-                error_log("Usuário não encontrado: " . $email);
             }
-        
+
         } catch (PDOException $e) {
             $erro = 'Erro no banco de dados: ' . $e->getMessage();
-            error_log("Erro PDO: " . $e->getMessage());
         }
     }
-}    
+}
 ?>
 
 <!DOCTYPE html>
@@ -169,7 +144,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <div class="login-links">
                 <a href="cadastro.php" class="link">Não tem conta? Cadastre-se</a>
             </div>
-
         </div>
     </div>
 </body>

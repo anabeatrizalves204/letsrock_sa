@@ -122,9 +122,12 @@ INSERT INTO usuarios (nome, nascimento, email, senha_hash, telefone) VALUES
 ('Fernanda Carvalho', '1992-01-30', 'fernanda.carvalho@example.com', SHA2('senha123', 256), '11999999920'),
 ('Kaio Eduardo Soares Fragoso', '2007-12-01', 'kaiodudu10@gmail.com', SHA2('123456', 256), '47999169146');
 
+ALTER TABLE usuarios ADD COLUMN is_admin BOOLEAN DEFAULT FALSE;
 
-drop database sa_loja;
-
-select * from usuarios;
-
-Select * from discos;
+INSERT INTO usuarios (nome, email, senha_hash, is_admin)
+VALUES (
+    'Administrador',
+    'admin@letsrock.com',
+    '$2y$10$1.emyd2jk96TSm.beHcl3OKSXFOXXBQRYKO96J3rXh2z5aZEGfu7C',
+    true
+);

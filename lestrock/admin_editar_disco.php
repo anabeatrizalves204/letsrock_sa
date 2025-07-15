@@ -100,6 +100,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 </head>
 <body>
     <h1>Editar Disco</h1>
+    <a href="admin_dashboard.php"><button>← Voltar para o Painel</button></a><br><br>
+
 
     <?php if ($mensagem): ?>
         <p><strong><?= htmlspecialchars($mensagem) ?></strong></p>

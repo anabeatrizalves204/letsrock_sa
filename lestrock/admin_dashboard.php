@@ -40,6 +40,17 @@ if (!isset($_SESSION['usuario_id']) || empty($_SESSION['is_admin'])) {
                 <h2>💿 Cadastrar Disco</h2>
                 <p>Cadastre novos discos.</p>
             </a>
+
+            <a href="admin_cadastrar_funcionario.php" class="card">
+                <h2>🧑‍💻 Cadastrar Usuário/Funcionário</h2>
+                <p>Cadastre novos usuários ou funcionários.</p>
+            </a>
+
+            <a href="admin_funcionarios.php" class="card">
+                <h2>🧑‍💻 Gerenciar Funcionários</h2>
+                <p>Visualize ou edite dados de funcionários cadastrados.</p>
+            </a>
+
         </div>
 
         <a href="logout.php" class="logout-btn">Sair</a>

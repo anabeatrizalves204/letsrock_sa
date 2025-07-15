@@ -24,7 +24,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['excluir_id'])) {
 }
 
 // Buscar usuários
-$usuarios = $pdo->query("SELECT id, nome, email, telefone, data_cadastro FROM usuarios ORDER BY data_cadastro DESC")->fetchAll(PDO::FETCH_ASSOC);
+$termoBusca = isset($_GET['busca']) ? trim($_GET['busca']) : '';
+
+if ($termoBusca !== '') {
+    $stmt = $pdo->prepare("SELECT id, nome, email, telefone, data_cadastro FROM usuarios WHERE nome LIKE :busca OR email LIKE :busca ORDER BY data_cadastro DESC");
+    $stmt->execute(['busca' => "%$termoBusca%"]);
+    $usuarios = $stmt->fetchAll(PDO::FETCH_ASSOC);
+} else {
+    $usuarios = $pdo->query("SELECT id, nome, email, telefone, data_cadastro FROM usuarios ORDER BY data_cadastro DESC")->fetchAll(PDO::FETCH_ASSOC);
+}
+
 ?>
 
 <!DOCTYPE html>
@@ -35,8 +44,30 @@ $usuarios = $pdo->query("SELECT id, nome, email, telefone, data_cadastro FROM us
     <link rel="stylesheet" href="css/admin_usuarios.css">
 </head>
 <body>
+<nav class="topbar">
+    <ul class="nav-links">
+        <li><a href="admin_dashboard.php">Dashboard</a></li>
+        <li><a href="admin_pedidos.php">Pedidos</a></li>
+        <li><a href="admin_usuarios.php">Usuários</a></li>
+        <li><a href="admin_funcionarios.php">Funcionários</a></li>
+        <li><a href="admin_cadastrar_disco.php">Novo Disco</a></li>
+        <li><a href="admin_cadastrar_funcionario.php">Novo Funcionário</a></li>
+        <li><a href="admin_estoque.php">Estoque</a></li>
+    </ul>
+</nav>
+ 
+
+<div class="container" style="margin-top: 80px;">
     <div class="container">
         <h1> Usuários Cadastrados</h1>
+        <a href="admin_dashboard.php" class="voltar-btn">← Voltar ao Painel</a>
+
+        <div class="container-busca">
+    <form method="get" class="form-pesquisa">
+        <input type="text" name="busca" placeholder="Buscar por nome ou e-mail..." value="<?= isset($_GET['busca']) ? htmlspecialchars($_GET['busca']) : '' ?>">
+        <button type="submit">Buscar</button>
+    </form>
+</div>
         <table>
             <thead>
                 <tr>
@@ -72,8 +103,6 @@ $usuarios = $pdo->query("SELECT id, nome, email, telefone, data_cadastro FROM us
                 <?php endforeach; ?>
             </tbody>
         </table>
-
-        <a href="admin_dashboard.php" class="voltar-btn">← Voltar ao Painel</a>
     </div>
 </body>
 </html>

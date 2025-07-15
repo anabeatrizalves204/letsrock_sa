@@ -55,7 +55,7 @@ if (isset($_POST['editar_id'])) {
 <head>
     <meta charset="UTF-8">
     <title>Editar Usuário</title>
-    <link rel="stylesheet" href="css/admin_usuarios.css">
+    <link rel="stylesheet" href="css/admin_editar_usuario.css">
 </head>
 <body>
     <div class="container">
